@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -28,14 +29,14 @@ public class DiaryNoteController {
     public ResponseEntity<?> createOrUpdateNote(@RequestBody DiaryNoteDTO dto) {
         Optional<User> userOpt = userRepository.findById(dto.getUserId());
         if (userOpt.isEmpty()) {
-            return ResponseEntity.badRequest().body("User not found");
+            // Trả về JSON lỗi thay vì plain text
+            return ResponseEntity.badRequest().body(Map.of("error", "User not found"));
         }
 
         User user = userOpt.get();
         LocalDate today = LocalDate.now();
         LocalDateTime now = LocalDateTime.now();
 
-        // Tìm ghi chú cũ nếu có
         Optional<DiaryNote> existingNote = diaryNoteRepository.findByUserIdAndDate(user.getId(), today);
 
         if (existingNote.isPresent()) {
@@ -43,18 +44,21 @@ public class DiaryNoteController {
             oldNote.setTitle(dto.getTitle());
             oldNote.setContent(dto.getContent());
             oldNote.setTimestamp(now);
-            oldNote.setEmojiUrls(dto.getEmojiUrls()); // cập nhật emoji
+            oldNote.setEmojiUrls(dto.getEmojiUrls());
             diaryNoteRepository.save(oldNote);
-            return ResponseEntity.ok("Note updated");
+
+            // Trả về JSON đúng định dạng
+            return ResponseEntity.ok(Map.of("message", "Note updated"));
         } else {
             DiaryNote newNote = new DiaryNote();
-            newNote.setUser(user);
+            newNote.setUser(user); // Entity vẫn cần User object
             newNote.setTitle(dto.getTitle());
             newNote.setContent(dto.getContent());
             newNote.setTimestamp(now);
-            newNote.setEmojiUrls(dto.getEmojiUrls()); // lưu emoji
+            newNote.setEmojiUrls(dto.getEmojiUrls());
             diaryNoteRepository.save(newNote);
-            return ResponseEntity.ok("Note created");
+
+            return ResponseEntity.ok(Map.of("message", "Note created"));
         }
     }
 

@@ -2,6 +2,7 @@ package com.MOPR.diaryapp.DTO;
 
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -10,4 +11,5 @@ public class DiaryNoteDTO {
     private String title;
     private String content;
     private List<String> emojiUrls; // danh sách URL emoji được chọn
+    private LocalDateTime timestamp;
 }
