@@ -14,16 +14,18 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/posts")
+@RequiredArgsConstructor
+@CrossOrigin(origins = "*")
 public class DiaryPostController {
 
     @Autowired
-    private DiaryPostRepository postRepo;
+    private final DiaryPostRepository postRepo;
 
     @Autowired
-    private FriendshipRepository friendshipRepo;
+    private final FriendshipRepository friendshipRepo;
 
     @Autowired
-    private UserRepository userRepo;
+    private final UserRepository userRepo;
 
     @PostMapping("/create")
     public DiaryPost createPost(@RequestBody DiaryPost post, @RequestParam Long userId) {
@@ -44,9 +46,9 @@ public class DiaryPostController {
         return postRepo.findByUserId(userId);
     }
 
-    @GetMapping("/friends/{userId}")
-    public List<DiaryPost> getFriendsPosts(@PathVariable Long userId) {
-        List<User> friends = friendshipRepo.findAcceptedFriends(userId);
-        return postRepo.findByUserIn(friends);
+    @GetMapping("/friendship/{userId}")
+    public List<DiaryPost> getFriendshipPosts(@PathVariable Long userId) {
+        List<User> friendship = friendshipRepo.findAcceptedFriends(userId);
+        return postRepo.findByUserIn(friendship);
     }
 }
