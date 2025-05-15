@@ -1,5 +1,6 @@
 package com.MOPR.diaryapp.controller;
 
+import com.MOPR.diaryapp.DTO.SignupResponse;
 import com.MOPR.diaryapp.model.SignupRequest;
 import com.MOPR.diaryapp.model.User;
 import com.MOPR.diaryapp.service.EmailService;
@@ -51,12 +52,11 @@ public class SignupController {
             @RequestParam String username,
             @RequestParam String password) {
 
-        Map<String, Object> response = new HashMap<>();
-
         if (!otpService.validateOTP(email, otp)) {
-            response.put("success", false);
-            response.put("message", "Mã OTP không đúng");
-            return ResponseEntity.badRequest().body(response);
+            return ResponseEntity.badRequest().body(Map.of(
+                    "success", false,
+                    "message", "Mã OTP không đúng"
+            ));
         }
 
         User user = new User();
@@ -66,8 +66,7 @@ public class SignupController {
         userService.saveUser(user);
         otpService.clearOTP(email);
 
-        response.put("success", true);
-        response.put("message", "Đăng ký thành công");
+        SignupResponse response = new SignupResponse(user.getId(), user.getUsername(), user.getEmail());
         return ResponseEntity.ok(response);
     }
 
