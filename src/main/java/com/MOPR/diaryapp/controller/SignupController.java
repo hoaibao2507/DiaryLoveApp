@@ -23,27 +23,28 @@ public class SignupController {
 
     @PostMapping
     public ResponseEntity<?> processSignup(@RequestBody SignupRequest signupRequest) {
-        Map<String, Object> response = new HashMap<>();
 
         if (!signupRequest.getPassword().equals(signupRequest.getConfirmPassword())) {
-            response.put("success", false);
-            response.put("message", "Mật khẩu không trùng khớp");
-            return ResponseEntity.badRequest().body(response);
+            return ResponseEntity.badRequest().body(Map.of(
+                    "success", false,
+                    "message", "Mật khẩu không trùng khớp"
+            ));
         }
 
         if (userService.existsByEmail(signupRequest.getEmail())) {
-            response.put("success", false);
-            response.put("message", "Email đã được sử dụng");
-            return ResponseEntity.badRequest().body(response);
+            return ResponseEntity.badRequest().body(Map.of(
+                    "success", false,
+                    "message", "Email đã được sử dụng"
+            ));
         }
 
         String otp = otpService.generateOTP(signupRequest.getEmail());
         emailService.sendOTPEmail(signupRequest.getEmail(), otp);
 
-        response.put("success", true);
-        response.put("message", "Đã gửi mã OTP tới email");
-        return ResponseEntity.ok(response);
+        // ✅ Trả về chính đối tượng SignupRequest
+        return ResponseEntity.ok(signupRequest);
     }
+
 
     @PostMapping("/verify-otp")
     public ResponseEntity<?> verifyOTP(
