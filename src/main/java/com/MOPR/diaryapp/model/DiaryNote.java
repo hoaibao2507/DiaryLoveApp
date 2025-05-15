@@ -5,6 +5,7 @@ import lombok.Data;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
 @Entity
 @Data
@@ -21,7 +22,12 @@ public class DiaryNote {
 
     private LocalDateTime timestamp;
 
+    @ElementCollection
+    @CollectionTable(name = "diary_note_emojis", joinColumns = @JoinColumn(name = "note_id"))
+    @Column(name = "emoji_url")
+    private List<String> emojiUrls;
+
     @ManyToOne
-    @JoinColumn(name = "user_id") // tên cột FK trong DB
+    @JoinColumn(name = "user_id")
     private User user;
 }

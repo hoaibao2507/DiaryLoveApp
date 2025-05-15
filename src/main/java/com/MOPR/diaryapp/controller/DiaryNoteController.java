@@ -43,6 +43,7 @@ public class DiaryNoteController {
             oldNote.setTitle(dto.getTitle());
             oldNote.setContent(dto.getContent());
             oldNote.setTimestamp(now);
+            oldNote.setEmojiUrls(dto.getEmojiUrls()); // cập nhật emoji
             diaryNoteRepository.save(oldNote);
             return ResponseEntity.ok("Note updated");
         } else {
@@ -51,6 +52,7 @@ public class DiaryNoteController {
             newNote.setTitle(dto.getTitle());
             newNote.setContent(dto.getContent());
             newNote.setTimestamp(now);
+            newNote.setEmojiUrls(dto.getEmojiUrls()); // lưu emoji
             diaryNoteRepository.save(newNote);
             return ResponseEntity.ok("Note created");
         }
