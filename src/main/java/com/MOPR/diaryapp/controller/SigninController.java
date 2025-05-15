@@ -1,5 +1,6 @@
 package com.MOPR.diaryapp.controller;
 
+import com.MOPR.diaryapp.DTO.LoginResponse;
 import com.MOPR.diaryapp.model.User;
 import com.MOPR.diaryapp.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,10 +19,10 @@ public class SigninController {
         User user = userService.authenticate(email, password);
 
         if (user == null) {
-            return ResponseEntity.status(401).body("Email hoặc mật khẩu không đúng");
+            return ResponseEntity.status(401).body("{\"message\": \"Email hoặc mật khẩu không đúng\"}");
         }
 
-        // Bạn có thể trả thêm thông tin người dùng nếu cần
-        return ResponseEntity.ok("Đăng nhập thành công: " + user.getUsername());
+        LoginResponse response = new LoginResponse(user.getId(), user.getUsername(), user.getEmail());
+        return ResponseEntity.ok(response);
     }
 }
