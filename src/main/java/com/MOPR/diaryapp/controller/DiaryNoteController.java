@@ -26,40 +26,25 @@ public class DiaryNoteController {
 
     // Tạo hoặc cập nhật ghi chú trong ngày
     @PostMapping
-    public ResponseEntity<?> createOrUpdateNote(@RequestBody DiaryNoteDTO dto) {
+    public ResponseEntity<?> createNote(@RequestBody DiaryNoteDTO dto) {
         Optional<User> userOpt = userRepository.findById(dto.getUserId());
         if (userOpt.isEmpty()) {
-            // Trả về JSON lỗi thay vì plain text
             return ResponseEntity.badRequest().body(Map.of("error", "User not found"));
         }
 
         User user = userOpt.get();
-        LocalDate today = LocalDate.now();
         LocalDateTime now = LocalDateTime.now();
 
-        Optional<DiaryNote> existingNote = diaryNoteRepository.findByUserIdAndDate(user.getId(), today);
+        DiaryNote newNote = new DiaryNote();
+        newNote.setUser(user);
+        newNote.setTitle(dto.getTitle());
+        newNote.setContent(dto.getContent());
+        newNote.setTimestamp(now);
+        newNote.setEmojiUrls(dto.getEmojiUrls());
 
-        if (existingNote.isPresent()) {
-            DiaryNote oldNote = existingNote.get();
-            oldNote.setTitle(dto.getTitle());
-            oldNote.setContent(dto.getContent());
-            oldNote.setTimestamp(now);
-            oldNote.setEmojiUrls(dto.getEmojiUrls());
-            diaryNoteRepository.save(oldNote);
+        diaryNoteRepository.save(newNote);
 
-            // Trả về JSON đúng định dạng
-            return ResponseEntity.ok(Map.of("message", "Note updated"));
-        } else {
-            DiaryNote newNote = new DiaryNote();
-            newNote.setUser(user); // Entity vẫn cần User object
-            newNote.setTitle(dto.getTitle());
-            newNote.setContent(dto.getContent());
-            newNote.setTimestamp(now);
-            newNote.setEmojiUrls(dto.getEmojiUrls());
-            diaryNoteRepository.save(newNote);
-
-            return ResponseEntity.ok(Map.of("message", "Note created"));
-        }
+        return ResponseEntity.ok(Map.of("message", "Note created"));
     }
 
     // Lấy ghi chú theo ngày
@@ -80,4 +65,12 @@ public class DiaryNoteController {
                 .toList();
         return ResponseEntity.ok(dates);
     }
+
+    // Lấy tất cả ghi chú của user
+    @GetMapping("/all")
+    public ResponseEntity<?> getAllNotesByUser(@RequestParam Long userId) {
+        List<DiaryNote> notes = diaryNoteRepository.findAllByUserId(userId);
+        return ResponseEntity.ok(notes);
+    }
+
 }
